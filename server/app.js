@@ -33,9 +33,9 @@ app.get("/", (req, res) => {
   res.send("welcome to your api");
 });
 
-app.listen(PORT, async () => {
-  console.log("Ticket Monitoring API running on", PORT);
-  await connectToDatabase();
-});
+//app.listen(PORT, async () => {
+//  console.log("Ticket Monitoring API running on", PORT);
+//  await connectToDatabase();
+//});
 
 export default app;
