@@ -14,8 +14,8 @@ app.set("trust proxy", 1);
 // Enable CORS
 app.use(
   cors({
-    origin: "*", // Allow requests from your React frontend
-    credentials: false, // Allow cookies and credentials
+    origin: "https://ticket-mon-18lk.vercel.app",
+    credentials: true,
   })
 );
 
