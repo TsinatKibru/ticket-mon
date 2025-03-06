@@ -9,6 +9,7 @@ import connectToDatabase from "./database/mongodb.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
 import apiLimiter from "./middlewares/ratelimiter.middleware.js";
 const app = express();
+app.set("trust proxy", 1); 
 
 // Enable CORS
 app.use(
@@ -37,5 +38,10 @@ app.get("/", (req, res) => {
 //  console.log("Ticket Monitoring API running on", PORT);
 //  await connectToDatabase();
 //});
-
+if (!process.env.VERCEL) {
+  app.listen(PORT || 5500, async () => {
+    console.log("Ticket Monitoring API running on", PORT || 5000);
+    await connectToDatabase();
+  });
+}
 export default app;
