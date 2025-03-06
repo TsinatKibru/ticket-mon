@@ -14,8 +14,8 @@ app.set("trust proxy", 1);
 // Enable CORS
 app.use(
   cors({
-    origin: "http://localhost:3000", // Allow requests from your React frontend
-    credentials: true, // Allow cookies and credentials
+    origin: "*", // Allow requests from your React frontend
+    credentials: false, // Allow cookies and credentials
   })
 );
 
