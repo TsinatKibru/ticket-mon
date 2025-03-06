@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import moment from "moment";
-import { fetchUsers, deleteUserById, addNewUser } from "../utils/api";
+import { fetchUsers, deleteUserById, updateUserRole } from "../utils/api"; // Add updateUserRole
 import {
   getUsersContent,
   deleteUser,
-  addNewUser as addNewUserAction,
+  updateUserRoleAction, // Add updateUserRoleAction
 } from "../redux/slices/userSlice";
 import TitleCard from "../components/TitleCard";
 import TopSideButtons from "../components/TopSideButtons";
@@ -46,6 +46,31 @@ class UserList extends Component {
     });
   };
 
+  handleRoleChange = async (userId, newRole) => {
+    const { token } = this.props.auth;
+
+    try {
+      // Update the user's role via API
+      const updatedUser = await updateUserRole(userId, newRole, token);
+
+      // Dispatch the updateUserRoleAction to update the Redux store
+      this.props.updateUserRoleAction({ userId, newRole });
+
+      // Show a success notification
+      this.props.showNotification({
+        message: `User role updated to ${newRole}!`,
+        status: 1,
+      });
+    } catch (error) {
+      // Show an error notification
+      this.props.showNotification({
+        message: "Failed to update user role. Please try again.",
+        status: 0,
+      });
+      console.error("Error updating user role:", error);
+    }
+  };
+
   getDummyStatus = (index) => {
     if (index % 5 === 0) return <div className="badge">Not Interested</div>;
     else if (index % 5 === 1)
@@ -59,7 +84,6 @@ class UserList extends Component {
 
   render() {
     const { users } = this.props;
-    console.log(users[0]);
 
     return (
       <>
@@ -84,9 +108,9 @@ class UserList extends Component {
                   <th>Name</th>
                   <th>Email Id</th>
                   <th>Created At</th>
-                  <th>Status</th>
+
                   <th>Role</th>
-                  <th></th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -110,8 +134,20 @@ class UserList extends Component {
                     </td>
                     <td>{user.email}</td>
                     <td>{moment(user.createdAt).format("DD MMM YY")}</td>
-                    <td>{this.getDummyStatus(k)}</td>
-                    <td>{user.role}</td>
+
+                    <td>
+                      <select
+                        className="select select-bordered select-sm"
+                        value={user.role}
+                        onChange={(e) =>
+                          this.handleRoleChange(user._id, e.target.value)
+                        }
+                      >
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                        <option value="support_agent">Support Agent</option>
+                      </select>
+                    </td>
                     <td>
                       <button
                         className="btn btn-square btn-ghost"
@@ -139,6 +175,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = {
   getUsersContent,
   deleteUser,
+  updateUserRoleAction, // Add updateUserRoleAction
   openModal,
   setPageTitle,
   showNotification,
