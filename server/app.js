@@ -9,7 +9,7 @@ import connectToDatabase from "./database/mongodb.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
 import apiLimiter from "./middlewares/ratelimiter.middleware.js";
 const app = express();
-app.set("trust proxy", 1); 
+app.set("trust proxy", 1);
 
 // Enable CORS
 app.use(
@@ -43,9 +43,13 @@ app.get("/", (req, res) => {
 //  await connectToDatabase();
 //});
 if (!process.env.VERCEL) {
-  app.listen(PORT , async () => {
+  app.listen(PORT, async () => {
     console.log("Ticket Monitoring API running on", PORT);
     await connectToDatabase();
+  });
+} else {
+  connectToDatabase().catch((err) => {
+    console.error("Database connection failed:", err);
   });
 }
 export default app;
