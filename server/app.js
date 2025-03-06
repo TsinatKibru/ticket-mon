@@ -30,8 +30,12 @@ app.use("/api/v1/tickets", ticketRouter);
 
 app.use(errorMiddleware);
 
+//app.get("/", (req, res) => {
+//  res.send("welcome to your api ");
+//});
 app.get("/", (req, res) => {
-  res.send("welcome to your api");
+  const port = process.env.PORT || "Port not found"; // Get the PORT environment variable
+  res.send(`Welcome to your API. Port: ${port}`);
 });
 
 //app.listen(PORT, async () => {
