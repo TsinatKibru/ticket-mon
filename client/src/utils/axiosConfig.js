@@ -17,8 +17,8 @@
 import axios from "axios";
 
 // Set the base URL for all requests
-axios.defaults.baseURL = "http://localhost:5500"; // Replace with your backend URL
-
+// axios.defaults.baseURL = "http://localhost:5500"; // Replace with your backend URL
+axios.defaults.baseURL = "https://ticket-mon.vercel.app";
 // Include credentials if needed (optional)
 axios.defaults.withCredentials = true;
 
