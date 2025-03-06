@@ -34,7 +34,7 @@ app.use(errorMiddleware);
 //  res.send("welcome to your api ");
 //});
 app.get("/", (req, res) => {
-  const port = process.env.PORT || "Port not found"; // Get the PORT environment variable
+  const port = PORT || "Port not found"; // Get the PORT environment variable
   res.send(`Welcome to your API. Port: ${port}`);
 });
 
@@ -43,8 +43,8 @@ app.get("/", (req, res) => {
 //  await connectToDatabase();
 //});
 if (!process.env.VERCEL) {
-  app.listen(PORT || 5500, async () => {
-    console.log("Ticket Monitoring API running on", PORT || 5000);
+  app.listen(PORT , async () => {
+    console.log("Ticket Monitoring API running on", PORT);
     await connectToDatabase();
   });
 }
