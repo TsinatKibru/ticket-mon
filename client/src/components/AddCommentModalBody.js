@@ -3,7 +3,8 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import { showNotification } from "../redux/slices/headerSlice";
 import { addCommentToTicket } from "../redux/slices/ticketSlice";
-
+import { toast, ToastContainer } from "react-toastify"; // Import react-toastify
+import "react-toastify/dist/ReactToastify.css";
 const AddCommentModalBody = ({ closeModal, extraObject }) => {
   const { ticketId } = extraObject;
   const dispatch = useDispatch();
@@ -38,6 +39,7 @@ const AddCommentModalBody = ({ closeModal, extraObject }) => {
       console.log("ticketid and comment", ticketId, newComment);
 
       dispatch(addCommentToTicket({ ticketId: ticketId, comment: newComment }));
+      toast.success(`Comment Added Sucessfully!`);
       closeModal();
     } catch (error) {
       dispatch(

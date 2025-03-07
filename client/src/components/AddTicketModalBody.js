@@ -4,6 +4,8 @@ import InputText from "./Input/InputText";
 import ErrorText from "./ErrorText";
 import { addTicket } from "../redux/slices/ticketSlice";
 import { addTicketsAPi } from "../utils/api";
+import { toast, ToastContainer } from "react-toastify"; // Import react-toastify
+import "react-toastify/dist/ReactToastify.css";
 
 const INITIAL_TICKET_OBJ = {
   title: "",
@@ -29,7 +31,10 @@ function AddTicketModalBody({ closeModal }) {
 
     try {
       const response = await addTicketsAPi(ticketObj);
-      dispatch(addTicket(response));
+      if (response?._id != null) {
+        dispatch(addTicket(response));
+        toast.success(`Ticket Created Sucessfully!`);
+      }
 
       closeModal();
       setTicketObj(INITIAL_TICKET_OBJ); //reset the form.

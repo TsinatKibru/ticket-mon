@@ -4,7 +4,8 @@ import InputText from "./Input/InputText";
 import ErrorText from "./ErrorText";
 import { addNewUser as addNewUserAction } from "../redux/slices/userSlice";
 import { addNewUser } from "../utils/api";
-
+import { toast, ToastContainer } from "react-toastify"; // Import react-toastify
+import "react-toastify/dist/ReactToastify.css";
 const INITIAL_USER_OBJ = {
   name: "",
   email: "",
@@ -18,7 +19,7 @@ function AddUserModalBody({ closeModal }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [userObj, setUserObj] = useState(INITIAL_USER_OBJ);
 
-  const saveNewUser = () => {
+  const saveNewUser = async () => {
     if (userObj.name.trim() === "") return setErrorMessage("Name is required!");
     else if (userObj.email.trim() === "")
       return setErrorMessage("Email id is required!");
@@ -28,13 +29,20 @@ function AddUserModalBody({ closeModal }) {
         password: "1qaz2wsx", // You might want to handle this differently
       };
 
-      addNewUser(newUserObj).then(() => {
-        console.log("d,hvjbksdjgdjvh");
+      const response = await addNewUser(newUserObj);
+      if (response.success === true) {
         dispatch(addNewUserAction({ newUserObj }));
+        toast.success(`User Added Sucessfully!`);
+      }
+      closeModal();
 
-        // dispatch(showNotification({ message: "New User Added!", status: 1 }));
-        closeModal();
-      });
+      // addNewUser(newUserObj).then(() => {
+      //   console.log("d,hvjbksdjgdjvh");
+      //   dispatch(addNewUserAction({ newUserObj }));
+
+      //   // dispatch(showNotification({ message: "New User Added!", status: 1 }));
+      //   closeModal();
+      // });
     }
   };
 
