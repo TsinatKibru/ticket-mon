@@ -40,6 +40,19 @@ class UserList extends Component {
     });
   };
 
+  openConfirmUserDelete = (index) => {
+    const userId = this.props.users[index]._id;
+    this.props.openModal({
+      title: "Confirm Delete!",
+      bodyType: MODAL_BODY_TYPES.CONFIRMATION,
+      extraObject: {
+        ticketId: userId,
+        type: CONFIRMATION_MODAL_CLOSE_TYPES.USER_DELETE,
+        message: "Deleting a User,Are You sure? ",
+      },
+    });
+  };
+
   openAddNewUserModal = () => {
     this.props.openModal({
       title: "Add New User",
@@ -146,7 +159,7 @@ class UserList extends Component {
                     <td>
                       <button
                         className="btn btn-square btn-ghost"
-                        onClick={() => this.deleteCurrentUser(k)}
+                        onClick={() => this.openConfirmUserDelete(k)}
                       >
                         <TrashIcon className="w-5" />
                       </button>

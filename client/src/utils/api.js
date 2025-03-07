@@ -22,11 +22,10 @@ export const fetchTicketsAPi = async () => {
   }
 };
 
-export const deleteUserById = async (userId, token) => {
+export const deleteUserById = async (userId) => {
   try {
-    const response = await axios.delete(`${API_URL}/users/${userId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await axios.delete(`${API_URL}/users/${userId}`);
+
     return response.data;
   } catch (error) {
     console.error("Error deleting user:", error);

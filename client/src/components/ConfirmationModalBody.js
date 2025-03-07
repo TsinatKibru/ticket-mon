@@ -4,8 +4,9 @@ import {
   CONFIRMATION_MODAL_CLOSE_TYPES,
   MODAL_CLOSE_TYPES,
 } from "../utils/globalConstantUtil";
-import { deleteTicketsAPi } from "../utils/api";
+import { deleteTicketsAPi, deleteUserById } from "../utils/api";
 import { deleteTicket } from "../redux/slices/ticketSlice";
+import { deleteUser } from "../redux/slices/userSlice";
 
 function ConfirmationModalBody({ extraObject, closeModal }) {
   const dispatch = useDispatch();
@@ -17,6 +18,12 @@ function ConfirmationModalBody({ extraObject, closeModal }) {
       const response = await deleteTicketsAPi(ticketId);
       if (response.success === true) {
         dispatch(deleteTicket(ticketId));
+      }
+    }
+    if (type === CONFIRMATION_MODAL_CLOSE_TYPES.USER_DELETE) {
+      const response = await deleteUserById(ticketId);
+      if (response.success === true) {
+        dispatch(deleteUser(ticketId));
       }
     }
     closeModal();
