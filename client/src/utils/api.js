@@ -39,7 +39,10 @@ export const addNewUser = async (userData) => {
     return response.data;
   } catch (error) {
     console.error("Error adding new user:", error);
-    throw error;
+    return {
+      success: false,
+      message: error.response.data.error,
+    };
   }
 };
 

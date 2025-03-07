@@ -4,50 +4,69 @@ import InputText from "./Input/InputText";
 import ErrorText from "./ErrorText";
 import { addNewUser as addNewUserAction } from "../redux/slices/userSlice";
 import { addNewUser } from "../utils/api";
-import { toast, ToastContainer } from "react-toastify"; // Import react-toastify
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 const INITIAL_USER_OBJ = {
   name: "",
   email: "",
   role: "user",
 };
 
+// Email validation regex
+const validateEmail = (email) => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+};
+
+// Role validation
+const validateRole = (role) => {
+  const allowedRoles = ["user", "admin", "support_agent"];
+  return allowedRoles.includes(role);
+};
+
 function AddUserModalBody({ closeModal }) {
   const dispatch = useDispatch();
 
-  const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [userObj, setUserObj] = useState(INITIAL_USER_OBJ);
 
   const saveNewUser = async () => {
-    if (userObj.name.trim() === "") return setErrorMessage("Name is required!");
-    else if (userObj.email.trim() === "")
-      return setErrorMessage("Email id is required!");
-    else {
-      const newUserObj = {
-        ...userObj,
-        password: "1qaz2wsx", // You might want to handle this differently
-      };
+    // Name validation
+    if (userObj.name.trim().length < 2) {
+      return setErrorMessage("Name must be at least 2 characters long!");
+    }
 
-      const response = await addNewUser(newUserObj);
-      if (response.success === true) {
-        dispatch(addNewUserAction({ newUserObj }));
-        toast.success(`User Added Sucessfully!`);
-      }
+    // Email validation
+    if (!validateEmail(userObj.email.trim())) {
+      return setErrorMessage("Please enter a valid email address!");
+    }
+
+    // Role validation
+    if (!validateRole(userObj.role)) {
+      return setErrorMessage("Invalid role selected!");
+    }
+
+    // If all validations pass, proceed to save the user
+    const newUserObj = {
+      ...userObj,
+      password: "1qaz2wsx", // You might want to handle this differently
+    };
+
+    const response = await addNewUser(newUserObj);
+
+    if (response.success === true) {
+      dispatch(addNewUserAction({ newUserObj: response.data.user }));
+      toast.success(`User Added Successfully!`);
       closeModal();
-
-      // addNewUser(newUserObj).then(() => {
-      //   console.log("d,hvjbksdjgdjvh");
-      //   dispatch(addNewUserAction({ newUserObj }));
-
-      //   // dispatch(showNotification({ message: "New User Added!", status: 1 }));
-      //   closeModal();
-      // });
+    } else {
+      setErrorMessage(response.message);
+      toast.error(`User Adding Failed!`);
     }
   };
 
   const updateFormValue = ({ updateType, value }) => {
-    setErrorMessage("");
+    setErrorMessage(""); // Clear error message on input change
     setUserObj({ ...userObj, [updateType]: value });
   };
 
@@ -69,14 +88,23 @@ function AddUserModalBody({ closeModal }) {
         labelTitle="Email Id"
         updateFormValue={updateFormValue}
       />
-      <InputText
-        type="text"
-        defaultValue={userObj.role}
-        updateType="role"
-        containerStyle="mt-4"
-        labelTitle="Role"
-        updateFormValue={updateFormValue}
-      />
+      <div className="mt-4">
+        <label className="label">
+          <span className="label-text">Role</span>
+        </label>
+        <select
+          className="select select-bordered w-full" // DaisyUI-styled dropdown
+          value={userObj.role}
+          onChange={(e) =>
+            updateFormValue({ updateType: "role", value: e.target.value })
+          }
+        >
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+          <option value="support_agent">Support Agent</option>
+        </select>
+      </div>
+
       <ErrorText styleClass="mt-16">{errorMessage}</ErrorText>
       <div className="modal-action">
         <button className="btn btn-ghost" onClick={() => closeModal()}>
