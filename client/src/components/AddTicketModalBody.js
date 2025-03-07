@@ -3,14 +3,13 @@ import { useDispatch } from "react-redux";
 import InputText from "./Input/InputText";
 import ErrorText from "./ErrorText";
 import { addTicket } from "../redux/slices/ticketSlice";
-import axios from "../utils/axiosConfig";
 import { addTicketsAPi } from "../utils/api";
 
 const INITIAL_TICKET_OBJ = {
   title: "",
   description: "",
-  priority: "Medium", // Default priority
-  category: "Technical", // Default category
+  priority: "Medium",
+  category: "Technical",
 };
 
 function AddTicketModalBody({ closeModal }) {

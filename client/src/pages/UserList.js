@@ -17,7 +17,8 @@ import {
 } from "../utils/globalConstantUtil";
 import TrashIcon from "@heroicons/react/24/outline/TrashIcon";
 import { showNotification } from "../redux/slices/headerSlice";
-
+import { toast, ToastContainer } from "react-toastify"; // Import react-toastify
+import "react-toastify/dist/ReactToastify.css";
 class UserList extends Component {
   componentDidMount() {
     const { token } = this.props.auth;
@@ -57,16 +58,10 @@ class UserList extends Component {
       this.props.updateUserRoleAction({ userId, newRole });
 
       // Show a success notification
-      this.props.showNotification({
-        message: `User role updated to ${newRole}!`,
-        status: 1,
-      });
+      toast.success(`User role updated to ${newRole}!`);
     } catch (error) {
       // Show an error notification
-      this.props.showNotification({
-        message: "Failed to update user role. Please try again.",
-        status: 0,
-      });
+      toast.error("Failed to update user role. Please try again.");
       console.error("Error updating user role:", error);
     }
   };

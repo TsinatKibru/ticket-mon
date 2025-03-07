@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import InputText from "./Input/InputText";
 import ErrorText from "./ErrorText";
-// import { showNotification } from "../../common/headerSlice";
 import { addNewUser as addNewUserAction } from "../redux/slices/userSlice";
 import { addNewUser } from "../utils/api";
 

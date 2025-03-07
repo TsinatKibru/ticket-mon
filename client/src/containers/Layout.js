@@ -3,6 +3,8 @@ import PageContent from "./PageContent";
 import LeftSidebar from "./LeftSidebar";
 import NotificationContainer from "./NotificationContainer";
 import ModalLayout from "../components/ModalLayout";
+import { toast, ToastContainer } from "react-toastify"; // Import react-toastify
+import "react-toastify/dist/ReactToastify.css";
 
 class Layout extends Component {
   render() {
@@ -19,8 +21,7 @@ class Layout extends Component {
           <LeftSidebar />
         </div>
 
-        {/* Notification layout container */}
-        {/* <NotificationContainer /> */}
+        <ToastContainer />
 
         {/* Modal layout container */}
         <ModalLayout />

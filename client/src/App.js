@@ -6,9 +6,6 @@ import {
   Navigate,
 } from "react-router-dom";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Tickets from "./pages/Tickets";
-import TicketDetails from "./pages/TicketDetails";
 import { connect } from "react-redux";
 import Layout from "./containers/Layout";
 import Register from "./pages/Register";
