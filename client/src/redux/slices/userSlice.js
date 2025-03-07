@@ -13,7 +13,7 @@ const userSlice = createSlice({
       state.users = action.payload;
     },
     deleteUser: (state, action) => {
-      state.users.splice(action.payload, 1);
+      state.users = state.users.filter((user) => user._id !== action.payload);
     },
     addNewUser: (state, action) => {
       state.users.push(action.payload.newUserObj);
