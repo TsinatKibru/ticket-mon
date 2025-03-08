@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Ticket from "./ticket.model.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -31,6 +32,33 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+userSchema.pre(
+  "deleteOne",
+  { document: true, query: false },
+  async function (next) {
+    const userId = this._id;
+
+    try {
+      // Delete all tickets where the user is the creator or assigned_to
+      await Ticket.deleteMany({
+        $or: [{ created_by: userId }, { assigned_to: userId }],
+      });
+      console.log("deleted");
+
+      // Delete all comments made by the user in other tickets
+      await Ticket.updateMany(
+        { "comments.created_by": userId },
+        { $pull: { comments: { created_by: userId } } }
+      );
+
+      next();
+    } catch (error) {
+      console.log("error");
+
+      next(error);
+    }
+  }
+);
 const User = mongoose.model("User", userSchema);
 
 export default User;

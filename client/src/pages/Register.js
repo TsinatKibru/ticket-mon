@@ -108,7 +108,7 @@ class Register extends Component {
                   className={`w-full p-2 rounded ${
                     loading
                       ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-blue-500 hover:bg-blue-600 text-white"
+                      : "btn btn-primary text-white"
                   }`}
                   disabled={loading}
                 >

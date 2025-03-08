@@ -13,13 +13,11 @@ const INITIAL_USER_OBJ = {
   role: "user",
 };
 
-// Email validation regex
 const validateEmail = (email) => {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return regex.test(email);
 };
 
-// Role validation
 const validateRole = (role) => {
   const allowedRoles = ["user", "admin", "support_agent"];
   return allowedRoles.includes(role);
@@ -27,39 +25,39 @@ const validateRole = (role) => {
 
 function AddUserModalBody({ closeModal }) {
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
   const [userObj, setUserObj] = useState(INITIAL_USER_OBJ);
 
   const saveNewUser = async () => {
-    // Name validation
     if (userObj.name.trim().length < 2) {
       return setErrorMessage("Name must be at least 2 characters long!");
     }
 
-    // Email validation
     if (!validateEmail(userObj.email.trim())) {
       return setErrorMessage("Please enter a valid email address!");
     }
 
-    // Role validation
     if (!validateRole(userObj.role)) {
       return setErrorMessage("Invalid role selected!");
     }
+    setLoading(true);
 
-    // If all validations pass, proceed to save the user
     const newUserObj = {
       ...userObj,
-      password: "1qaz2wsx", // You might want to handle this differently
+      password: "1qaz2wsx",
     };
 
     const response = await addNewUser(newUserObj);
 
     if (response.success === true) {
+      setLoading(false);
       dispatch(addNewUserAction({ newUserObj: response.data.user }));
       toast.success(`User Added Successfully!`);
       closeModal();
     } else {
+      setLoading(true);
       setErrorMessage(response.message);
       toast.error(`User Adding Failed!`);
     }
@@ -110,8 +108,12 @@ function AddUserModalBody({ closeModal }) {
         <button className="btn btn-ghost" onClick={() => closeModal()}>
           Cancel
         </button>
-        <button className="btn btn-primary px-6" onClick={() => saveNewUser()}>
-          Save
+        <button
+          className="btn btn-primary px-6"
+          disabled={loading}
+          onClick={() => saveNewUser()}
+        >
+          {loading ? "Saving..." : "Save"}
         </button>
       </div>
     </>
