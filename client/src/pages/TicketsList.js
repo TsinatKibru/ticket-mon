@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import moment from "moment";
-import axios from "axios";
 import TitleCard from "../components/TitleCard";
 import { openModal } from "../redux/slices/modalSlice";
 import { setPageTitle } from "../redux/slices/headerSlice";
@@ -16,45 +15,23 @@ import {
   CONFIRMATION_MODAL_CLOSE_TYPES,
   MODAL_BODY_TYPES,
 } from "../utils/globalConstantUtil";
-import {
-  getUsersContent,
-  addNewUser as addNewUserAction,
-} from "../redux/slices/userSlice";
+import { getUsersContent } from "../redux/slices/userSlice";
 import { showNotification } from "../redux/slices/headerSlice";
 import {
-  TrashIcon,
   ChatBubbleLeftIcon,
   ChevronDownIcon,
   ChevronUpIcon,
 } from "@heroicons/react/24/outline";
-import { fetchUsers } from "../utils/api";
-import { fetchTicketsAPi } from "../utils/api";
 import TicketActions from "../components/TicketActions";
 
 class TicketsList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: true,
+      loading: false,
       error: null,
       expandedTickets: {}, // Track which tickets are expanded to show comments
     };
-  }
-
-  componentDidMount() {
-    const { token } = this.props.auth;
-    fetchTicketsAPi().then((tickets) => {
-      this.props.getTickets(tickets);
-      this.setState({
-        tickets: tickets,
-        loading: false,
-      });
-    });
-
-    fetchUsers(token).then((users) => {
-      this.props.getUsersContent(users);
-    });
-    this.props.setPageTitle({ title: "Tickets" });
   }
 
   openAddCommentModal = (ticketId) => {
@@ -121,6 +98,7 @@ class TicketsList extends Component {
     const { loading, error, expandedTickets } = this.state;
 
     const { tickets } = this.props;
+
     const { user } = this.props.auth;
 
     if (loading) {
@@ -181,7 +159,7 @@ class TicketsList extends Component {
                         </div>
                       </td>
                       <td>{ticket.priority}</td>
-                      <td>{ticket.created_by.name}</td>
+                      <td>{ticket.created_by?.name}</td>
                       <td>{moment(ticket.createdAt).format("DD MMM YY")}</td>
                       <td>{ticket.assigned_to?.name || "None"}</td>
                       <td>
@@ -192,46 +170,6 @@ class TicketsList extends Component {
                           >
                             <ChatBubbleLeftIcon className="w-5" />
                           </button>
-                          {/* {user.role === "admin" && (
-                            <button
-                              className="btn btn-ghost btn-sm"
-                              onClick={() =>
-                                this.openAssignTicketModal(ticket._id)
-                              }
-                            >
-                              Assign
-                            </button>
-                          )}
-                          {user._id === ticket.created_by._id && (
-                            <button
-                              className="btn btn-ghost btn-sm"
-                              onClick={() => this.openUpdateTicketModal(ticket)}
-                            >
-                              Update
-                            </button>
-                          )}
-                          {user.role === "support_agent" && (
-                            <button
-                              className="btn btn-ghost btn-sm"
-                              onClick={() =>
-                                this.openTicketStatusChnageModal(ticket._id)
-                              }
-                            >
-                              UpdateStatus
-                            </button>
-                          )}
-
-                          
-                          {user.role === "admin" && (
-                            <button
-                              className="btn btn-ghost btn-sm"
-                              onClick={() =>
-                                this.openConfirmTicketDelete(ticket._id)
-                              }
-                            >
-                              <TrashIcon className="w-5" />
-                            </button>
-                          )} */}
 
                           {/* Assign Ticket Button (only for admins) */}
                           <TicketActions

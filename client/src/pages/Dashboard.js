@@ -7,12 +7,15 @@ import {
   WrenchScrewdriverIcon,
   CheckBadgeIcon,
 } from "@heroicons/react/24/outline";
-
+import { connect } from "react-redux";
+import { getUsersContent } from "../redux/slices/userSlice";
 import { ArrowPathIcon, InboxArrowDownIcon } from "@heroicons/react/24/outline";
 import AmountStats from "../components/AmountStats";
 import MyTicketsChart from "../components/MyTicketsChart";
 import TicketStatusChart from "../components/TicketStatusChart";
 import RecentTickets from "../components/RecentTickets";
+import { fetchUsers, fetchTicketsAPi } from "../utils/api";
+import { getTickets } from "../redux/slices/ticketSlice";
 
 class Dashboard extends Component {
   constructor(props) {
@@ -33,7 +36,6 @@ class Dashboard extends Component {
   applyTheme = () => {
     const theme = localStorage.getItem("theme") || "light"; // Default to 'light'
     document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", "light");
   };
 
   getStatusIcon = (status) => {
@@ -50,31 +52,32 @@ class Dashboard extends Component {
   };
 
   fetchData = async () => {
-    const token = localStorage.getItem("token"); // Assuming the token is stored in localStorage after login
-
     try {
       // Fetch users
-      const usersResponse = await axios.get("/api/v1/users/", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const usersResponse = await fetchUsers();
+      if (usersResponse._id === null) {
+        throw new Error(usersResponse.message || "Failed to fetch users");
+      }
 
       // Fetch tickets
-      const ticketsResponse = await axios.get("/api/v1/tickets/", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const ticketsResponse = await fetchTicketsAPi();
+      if (ticketsResponse._id === null) {
+        throw new Error(ticketsResponse.message || "Failed to fetch tickets");
+      }
 
+      // Update state
       this.setState({
-        users: usersResponse.data.data,
-        tickets: ticketsResponse.data.data,
+        users: usersResponse,
+        tickets: ticketsResponse,
         loading: false,
       });
+
+      // Update Redux store (if needed)
+      this.props.getUsersContent(usersResponse);
+      this.props.getTickets(ticketsResponse);
     } catch (error) {
       this.setState({
-        error: "Failed to fetch data. Please try again later.",
+        error: error.message || "Failed to fetch data. Please try again later.",
         loading: false,
       });
       console.error("Error fetching data:", error);
@@ -90,13 +93,14 @@ class Dashboard extends Component {
       Resolved: 0,
     };
 
-    tickets.forEach((ticket) => {
-      if (statusCounts[ticket.status]) {
-        statusCounts[ticket.status]++;
-      } else {
-        statusCounts[ticket.status] = 1;
-      }
-    });
+    tickets != null &&
+      tickets?.forEach((ticket) => {
+        if (statusCounts[ticket.status]) {
+          statusCounts[ticket.status]++;
+        } else {
+          statusCounts[ticket.status] = 1;
+        }
+      });
 
     return statusCounts;
   };
@@ -105,7 +109,39 @@ class Dashboard extends Component {
     const { users, tickets, loading, error } = this.state;
 
     if (loading) {
-      return <div>Loading...</div>;
+      return (
+        <div className="px-0 py-6  md:px-6 ">
+          <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+
+          {/* Skeleton for Analytics Section */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {[1, 2, 3].map((item) => (
+              <div key={item} className="skeleton h-32 w-full"></div>
+            ))}
+          </div>
+
+          {/* Skeleton for Charts Section */}
+          <div className="grid lg:grid-cols-2 mt-4 grid-cols-1 gap-6">
+            <div className="skeleton h-64 w-full"></div>
+            <div className="skeleton h-64 w-full"></div>
+          </div>
+
+          {/* Skeleton for Ticket Status Distribution Section */}
+          <div className="px-0 py-6  md:px-6  rounded-lg shadow-md mb-8">
+            <h2 className="text-lg font-semibold mb-4">
+              Ticket Status Distribution
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[1, 2, 3].map((item) => (
+                <div key={item} className="skeleton h-24 w-full"></div>
+              ))}
+            </div>
+          </div>
+
+          {/* Skeleton for Recent Tickets Section */}
+          <div className="skeleton h-64 w-full"></div>
+        </div>
+      );
     }
 
     if (error) {
@@ -115,7 +151,7 @@ class Dashboard extends Component {
     const ticketStatusDistribution = this.getTicketStatusDistribution();
 
     return (
-      <div className="p-6">
+      <div className="px-0 py-6  md:px-6  ">
         <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
         {/* Analytics Section */}
@@ -142,12 +178,19 @@ class Dashboard extends Component {
             colorIndex={3}
           />
         </div>
+
+        {/* Charts Section */}
         <div className="grid lg:grid-cols-2 mt-4 grid-cols-1 gap-6">
-          <MyTicketsChart tickets={tickets} />
-          <TicketStatusChart tickets={tickets} />
+          {tickets != null && (
+            <>
+              <MyTicketsChart tickets={tickets} />
+              <TicketStatusChart tickets={tickets} />
+            </>
+          )}
         </div>
 
-        <div className="  p-6 rounded-lg shadow-md  mb-8">
+        {/* Ticket Status Distribution Section */}
+        <div className="px-0 py-6  md:px-6  rounded-lg shadow-md mb-8">
           <h2 className="text-lg font-semibold mb-4">
             Ticket Status Distribution
           </h2>
@@ -165,10 +208,20 @@ class Dashboard extends Component {
           </div>
         </div>
 
-        <RecentTickets tickets={tickets} />
+        {/* Recent Tickets Section */}
+        {tickets != null && <RecentTickets tickets={tickets} />}
       </div>
     );
   }
 }
 
-export default Dashboard;
+const mapStateToProps = (state) => ({
+  users: state.user.users,
+});
+
+const mapDispatchToProps = {
+  getUsersContent,
+  getTickets,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);

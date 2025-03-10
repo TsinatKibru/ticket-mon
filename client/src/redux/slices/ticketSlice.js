@@ -19,6 +19,11 @@ const ticketSlice = createSlice({
         (ticket) => ticket._id !== action.payload
       );
     },
+    deleteUserTickets: (state, action) => {
+      state.tickets = state.tickets.filter((ticket) => {
+        return ticket.created_by?._id !== action.payload;
+      });
+    },
     updateTicket: (state, action) => {
       const index = state.tickets.findIndex(
         (ticket) => ticket._id === action.payload._id
@@ -60,6 +65,7 @@ export const {
   getTickets,
   addTicket,
   deleteTicket,
+  deleteUserTickets,
   updateTicket,
   changeTicketStatus,
   assignTicketAction,

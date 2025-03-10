@@ -1,14 +1,22 @@
+import { jwtDecode } from "jwt-decode";
 import axios from "./axiosConfig";
 
 const API_URL = "/api/v1";
+
+const handleError = (error, message) => {
+  console.error(`${message}:`, error?.response?.data || error.message);
+  return {
+    success: false,
+    message: error?.response?.data?.error || "An unexpected error occurred.",
+  };
+};
 
 export const fetchUsers = async () => {
   try {
     const response = await axios.get(`${API_URL}/users/`);
     return response.data.data;
   } catch (error) {
-    console.error("Error fetching users:", error);
-    throw error;
+    return handleError(error, "Error fetching users");
   }
 };
 
@@ -17,19 +25,16 @@ export const fetchTicketsAPi = async () => {
     const response = await axios.get(`${API_URL}/tickets/`);
     return response.data.data;
   } catch (error) {
-    console.error("Error fetching tickets:", error);
-    throw error;
+    return null;
   }
 };
 
 export const deleteUserById = async (userId) => {
   try {
     const response = await axios.delete(`${API_URL}/users/${userId}`);
-
     return response.data;
   } catch (error) {
-    console.error("Error deleting user:", error);
-    throw error;
+    return handleError(error, "Error deleting user");
   }
 };
 
@@ -38,11 +43,7 @@ export const addNewUser = async (userData) => {
     const response = await axios.post(`${API_URL}/auth/sign-up`, userData);
     return response.data;
   } catch (error) {
-    console.error("Error adding new user:", error);
-    return {
-      success: false,
-      message: error.response.data.error,
-    };
+    return handleError(error, "Error adding new user");
   }
 };
 
@@ -51,8 +52,7 @@ export const addTicketsAPi = async (ticketdata) => {
     const response = await axios.post(`${API_URL}/tickets/`, ticketdata);
     return response.data.data;
   } catch (error) {
-    console.error("Error adding new ticket:", error);
-    throw error;
+    return handleError(error, "Error adding new ticket");
   }
 };
 
@@ -61,8 +61,7 @@ export const deleteTicketsAPi = async (ticketId) => {
     const response = await axios.delete(`${API_URL}/tickets/${ticketId}`);
     return response.data;
   } catch (error) {
-    console.error("Error deleting ticket:", error);
-    throw error;
+    return handleError(error, "Error deleting ticket");
   }
 };
 
@@ -71,20 +70,34 @@ export const updateTicketsAPi = async (ticketId, ticket) => {
     const response = await axios.put(`${API_URL}/tickets/${ticketId}`, ticket);
     return response.data.data;
   } catch (error) {
-    console.error("Error deleting ticket:", error);
-    throw error;
+    return handleError(error, "Error updating ticket");
   }
 };
 
 export const updateUserRole = async (userId, newRole, token) => {
-  const response = await axios.put(
-    `/api/v1/users/${userId}/role`,
-    { role: newRole },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return response.data.data;
+  try {
+    const response = await axios.put(
+      `${API_URL}/users/${userId}/role`,
+      { role: newRole },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data.data;
+  } catch (error) {
+    return handleError(error, "Error updating user role");
+  }
+};
+
+export const getCurrentUserApi = async (token) => {
+  try {
+    const decoded = jwtDecode(token);
+    const userId = decoded.userId;
+    const response = await axios.get(`${API_URL}/users/${userId}`);
+    return response.data.data;
+  } catch (error) {
+    return handleError(error, "Error updating ticket");
+  }
 };

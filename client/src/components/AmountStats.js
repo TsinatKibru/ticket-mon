@@ -2,7 +2,7 @@ function AmountStats({ title, value, icon, colorIndex }) {
   const COLORS = ["primary", "secondary"];
 
   return (
-    <div className="stats shadow">
+    <div className="stats shadow w-full">
       <div className="stat">
         <div
           className={`stat-figure text-${

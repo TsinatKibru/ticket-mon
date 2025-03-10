@@ -6,12 +6,11 @@ import { addTicket } from "../redux/slices/ticketSlice";
 import { addTicketsAPi } from "../utils/api";
 import { toast, ToastContainer } from "react-toastify"; // Import react-toastify
 import "react-toastify/dist/ReactToastify.css";
-
 const INITIAL_TICKET_OBJ = {
   title: "",
   description: "",
-  priority: "Medium",
-  category: "Technical",
+  priority: "Medium", // Default priority
+  category: "Technical", // Default category
 };
 
 function AddTicketModalBody({ closeModal }) {
@@ -31,13 +30,15 @@ function AddTicketModalBody({ closeModal }) {
 
     try {
       const response = await addTicketsAPi(ticketObj);
-      if (response?._id != null) {
+
+      if (response._id != null) {
         dispatch(addTicket(response));
         toast.success(`Ticket Created Sucessfully!`);
+        closeModal();
+        setTicketObj(INITIAL_TICKET_OBJ); //reset the form.
+      } else {
+        setErrorMessage(response.message);
       }
-
-      closeModal();
-      setTicketObj(INITIAL_TICKET_OBJ); //reset the form.
     } catch (error) {
       const errorMessage =
         error.response?.data?.error ||

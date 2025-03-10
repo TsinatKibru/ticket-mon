@@ -41,15 +41,9 @@ userSchema.pre(
     try {
       // Delete all tickets where the user is the creator or assigned_to
       await Ticket.deleteMany({
-        $or: [{ created_by: userId }, { assigned_to: userId }],
+        $or: [{ created_by: userId }],
       });
       console.log("deleted");
-
-      // Delete all comments made by the user in other tickets
-      await Ticket.updateMany(
-        { "comments.created_by": userId },
-        { $pull: { comments: { created_by: userId } } }
-      );
 
       next();
     } catch (error) {

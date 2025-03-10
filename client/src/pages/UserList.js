@@ -17,15 +17,16 @@ import {
 } from "../utils/globalConstantUtil";
 import TrashIcon from "@heroicons/react/24/outline/TrashIcon";
 import { showNotification } from "../redux/slices/headerSlice";
-import { toast, ToastContainer } from "react-toastify"; // Import react-toastify
-import "react-toastify/dist/ReactToastify.css";
-class UserList extends Component {
-  componentDidMount() {
-    const { token } = this.props.auth;
 
-    fetchUsers().then((users) => {
-      this.props.getUsersContent(users);
-    });
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+class UserList extends Component {
+  async componentDidMount() {
+    const response = await fetchUsers();
+    if (response._id != null) {
+      this.props.getUsersContent(response);
+    }
     this.props.setPageTitle({
       title: "/app/users/",
     });
@@ -37,6 +38,13 @@ class UserList extends Component {
     deleteUserById(userId, token).then(() => {
       this.props.deleteUser(index);
       this.props.showNotification({ message: "User Deleted!", status: 1 });
+    });
+  };
+
+  openAddNewUserModal = () => {
+    this.props.openModal({
+      title: "Add New User",
+      bodyType: MODAL_BODY_TYPES.USER_ADD_NEW,
     });
   };
 
@@ -53,45 +61,25 @@ class UserList extends Component {
     });
   };
 
-  openAddNewUserModal = () => {
-    this.props.openModal({
-      title: "Add New User",
-      bodyType: MODAL_BODY_TYPES.USER_ADD_NEW,
-    });
-  };
-
   handleRoleChange = async (userId, newRole) => {
     const { token } = this.props.auth;
 
     try {
-      // Update the user's role via API
       const updatedUser = await updateUserRole(userId, newRole, token);
 
-      // Dispatch the updateUserRoleAction to update the Redux store
       this.props.updateUserRoleAction({ userId, newRole });
 
-      // Show a success notification
-      toast.success(`User role updated to ${newRole}!`);
+      toast.success(`User role updated to ${newRole}!`); // Use
     } catch (error) {
-      // Show an error notification
-      toast.error("Failed to update user role. Please try again.");
+      toast.error(`User role update Failed!`);
       console.error("Error updating user role:", error);
     }
   };
 
-  getDummyStatus = (index) => {
-    if (index % 5 === 0) return <div className="badge">Not Interested</div>;
-    else if (index % 5 === 1)
-      return <div className="badge badge-primary">In Progress</div>;
-    else if (index % 5 === 2)
-      return <div className="badge badge-secondary">Sold</div>;
-    else if (index % 5 === 3)
-      return <div className="badge badge-accent">Need Followup</div>;
-    else return <div className="badge badge-ghost">Open</div>;
-  };
-
   render() {
     const { users } = this.props;
+    const { user } = this.props.auth;
+    const currentUser = user;
 
     return (
       <>
@@ -145,6 +133,7 @@ class UserList extends Component {
 
                     <td>
                       <select
+                        disabled={user._id === currentUser._id}
                         className="select select-bordered select-sm"
                         value={user.role}
                         onChange={(e) =>
@@ -156,8 +145,10 @@ class UserList extends Component {
                         <option value="support_agent">Support Agent</option>
                       </select>
                     </td>
+
                     <td>
                       <button
+                        disabled={user._id === currentUser._id}
                         className="btn btn-square btn-ghost"
                         onClick={() => this.openConfirmUserDelete(k)}
                       >
